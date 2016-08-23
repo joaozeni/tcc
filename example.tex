@@ -610,27 +610,62 @@ O \textit{Track} de computação paralela da SAT \textit{Competition} é
 feito em um processador de 12 núcleos com 36 GB de memória RAM.
 \footnote{http://www.satcompetition.org/2014/}
 
-\subsection{Lei de Amdahl}
-\label{sec:amdahl}
+\subsection{Paralelismo no problema SAT}
 
-Em computação paralela denomina-se \textit{speedup} como o ganho de velocidade 
-com a utilização de múltiplos processadores. O \textit{speedup} pode ser medido 
-pela relação entre o tempo gasto por um processador e o tempo gasto por múltiplos 
-processadores.
+\subsubsection{Tecnicas de parelização em \textit{SAT solvers}}
 
-O \textit{speedup} pode ser obtido através da Lei de Amdahl\cite{Amdahl1967}, esta lei leva em 
-consideração que o tempo gasto por múltiplos processadores é soma entre o tempo 
-gasto pela parte sequencial do algoritmo e a relação entre o número de processadores 
-e a parte paralela do algoritmo. Ela é descrita a seguir em \ref{eq:amdahl}.
+Uma maneira simples de resolver SAT em paralelo é executar diversos \textit{SAT solvers} 
+em paralelo, esta técnica é conhecida com portifolio. Esta técnica funciona executando 
+diversas versões do \textit{SAT solver} ou diversos \textit{SAT solvers} com diferentes 
+caracteristicas, sendo que que cada nó deve rodar um \textit{solver} otimizado para um 
+problema diferente assim obtendo uma performance média melhor. Esta técnica pode ser 
+denominada como competiva.
 
-$S(n)$ é o \textit{speedup} para n processadores, $T$ é o tempo gasto para n processadores, 
-n é o número de processadores e $B$ é a parte sequencial do algoritmo.
+Uma das vantagens desta técnica é sua fácil implementação, uma vez que pode ser realizada 
+utilizando apenas um script que inicia os diversos \textit{SAT solvers} nos nós do sistema. 
+Outra vantagem desta técnica é possibilidade de sua execução em qualquer sistema paralelo, uma 
+vez que cada instancia do problema a ser resolvido é completamente independente. Uma descrição 
+desta técnica é apresentada na figura \ref{fig:port}
 
-\begin{equation} \label{eq:amdahl}
-S(n)=\frac{T(1)}{T(n)}=\frac{T(1)}{T(1)(B+\frac{1}{n}(1-B))}=\frac{1}{B+\frac{1}{n}(1-B)}
-\end{equation}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figuras/portfolio.jpg}
+    \caption{Funcionamento de um algoritmo portfólio\cite{nelson2013new}}
+    \label{fig:port}
+\end{figure}
 
-\subsection{Algoritmos \textit{SAT Solver} Paralelos}
+\subsubsection{Problemas na parelização de \textit{SAT solvers}}
+
+Para \textit{solvers} paralelos portifolio não existem problemas de controle ou em 
+sua arquitetura, porém eles não apresentam grandes ganhos de performance. Existe um 
+ganho médio quando no protifolio existe um \textir{solver} ou heuristica que apresenta 
+uma perfomance muito boa para o problema a ser resolvido, porém isso pode não acontecer ou 
+o ganho pode ser pequeno. Outra questão é que boa parte do poder computacional utilizado 
+é simplesmente inutil, assim apresentando uma má utilização dos recursos disponiveis. Por 
+fim esta técnica não apresenta nenhum ganho para problemas que são insatifaziveis, e mesmo 
+neste cenário apresenta um custo muito maior.
+
+%\subsection{Lei de Amdahl}
+%\label{sec:amdahl}
+%
+%Em computação paralela denomina-se \textit{speedup} como o ganho de velocidade 
+%com a utilização de múltiplos processadores. O \textit{speedup} pode ser medido 
+%pela relação entre o tempo gasto por um processador e o tempo gasto por múltiplos 
+%processadores.
+%
+%O \textit{speedup} pode ser obtido através da Lei de Amdahl\cite{Amdahl1967}, esta lei leva em 
+%consideração que o tempo gasto por múltiplos processadores é soma entre o tempo 
+%gasto pela parte sequencial do algoritmo e a relação entre o número de processadores 
+%e a parte paralela do algoritmo. Ela é descrita a seguir em \ref{eq:amdahl}.
+%
+%$S(n)$ é o \textit{speedup} para n processadores, $T$ é o tempo gasto para n processadores, 
+%n é o número de processadores e $B$ é a parte sequencial do algoritmo.
+%
+%\begin{equation} \label{eq:amdahl}
+%S(n)=\frac{T(1)}{T(n)}=\frac{T(1)}{T(1)(B+\frac{1}{n}(1-B))}=\frac{1}{B+\frac{1}{n}(1-B)}
+%\end{equation}
+
+\subsubsection{Algoritmos \textit{SAT Solver} Paralelos}
 \label{sec:satparallel}
 
 Existem diversas técnicas para se resolver o problema SAT em paralelo, as duas mais 
@@ -686,21 +721,21 @@ Este \textit{solver} foi desenvolvido em C++ e MPI e sua arquitetura é apresent
 
 %GriSAT
 
-No contexto de técnicas de paralelização existe uma técnica conhecida como portfólio, essa 
-técnica consiste em executar múltiplos algoritmos distintos para solução de um problema 
-comum, no caso do SAT múltiplos \textit{SAT Solvers}. Nesta técnica os algoritmos a serem 
-utilizados devem ser escolhidos de forma a maximizar a velocidade de execução no caso médio, 
-procurando-se escolher algoritmos com propriedades distintas. Seu speedup não pode ser avaliado 
-pela Lei de Amdahl, pois não consiste na paralelização de um algoritmo e sim em uma técnica de 
-execução em paralelo. Uma descrição desta técnica é apresentada na 
-figura \ref{fig:port}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figuras/portfolio.jpg}
-    \caption{Funcionamento de um algoritmo portfólio\cite{nelson2013new}}
-    \label{fig:port}
-\end{figure}
+%No contexto de técnicas de paralelização existe uma técnica conhecida como portfólio, essa 
+%técnica consiste em executar múltiplos algoritmos distintos para solução de um problema 
+%comum, no caso do SAT múltiplos \textit{SAT Solvers}. Nesta técnica os algoritmos a serem 
+%utilizados devem ser escolhidos de forma a maximizar a velocidade de execução no caso médio, 
+%procurando-se escolher algoritmos com propriedades distintas. Seu speedup não pode ser avaliado 
+%pela Lei de Amdahl, pois não consiste na paralelização de um algoritmo e sim em uma técnica de 
+%execução em paralelo. Uma descrição desta técnica é apresentada na 
+%figura \ref{fig:port}
+%
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=0.8\textwidth]{figuras/portfolio.jpg}
+%    \caption{Funcionamento de um algoritmo portfólio\cite{nelson2013new}}
+%    \label{fig:port}
+%\end{figure}
 
 Uma implementação popular da técnica portfólio para o problema SAT é o ManySAT\cite{Hamadi09manysat}. 
 Este \textit{SAT solver} utiliza diferentes configurações aplicadas ao \textit{solver} 
