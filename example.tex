@@ -127,6 +127,8 @@ dado que hoje todas as áreas que utilizando \textit{SAT solver} tem como ferram
 de trabalho processadores multi-core e necessitam de algoritmos que 
 funcionem de forma eficiente nesses processadores.
 
+\section{Apresentação do Trabalho}
+
 \chapter{Fundamentação Teórica}
 \label{chap:fund}
 
@@ -241,7 +243,7 @@ Outro fato importante é o de que os problemas que podem ser escritos em
 2SAT possuem complexidade O(n), porém não é garantido que todas as fórmulas proposicionais 
 possam ser escritas na forma 2SAT\cite{Biere}.
 
-\section{Importância do Problema SAT}
+\subsection{Importância do Problema SAT}
 \label{sec:ipsat}
 
 A resolução de problemas SAT possui aplicação direta em diversas áreas, 
@@ -276,7 +278,7 @@ consiste em converter o modelo em uma fórmula proposicional e a partir dai util
 restritos e quando as especificações são dadas através de fórmulas em lógica 
 temporal.
 
-\section{Algoritmos SAT Solvers}
+\subsection{Algoritmos SAT Solvers}
 \label{sec:solver}
 
 Os \textit{SAT solvers} podem ser divididos em classes, sendo que as 
@@ -410,7 +412,7 @@ efetua esta conversão escrevendo a fórmula proposicional na forma DNF
 utilizado uma nova estrutura chamada quantum, que assegura maior eficácia 
 ao processo de conversão.
 
-\section{Algoritmo Base}
+\subsection{Algoritmo Base}
 \label{sec:algbase}
 
 % Utilizar trabalhos da jerusa e outros
@@ -612,14 +614,14 @@ feito em um processador de 12 núcleos com 36 GB de memória RAM.
 
 \subsection{Paralelismo no problema SAT}
 
-\subsubsection{Tecnicas de parelização em \textit{SAT solvers}}
+\subsection{Algoritmos portfólio}
 
 Uma maneira simples de resolver SAT em paralelo é executar diversos \textit{SAT solvers} 
-em paralelo, esta técnica é conhecida com portifolio. Esta técnica funciona executando 
+em paralelo, esta técnica é conhecida com portfólio. Esta técnica funciona executando 
 diversas versões do \textit{SAT solver} ou diversos \textit{SAT solvers} com diferentes 
-caracteristicas, sendo que que cada nó deve rodar um \textit{solver} otimizado para um 
+características, sendo que que cada nó deve rodar um \textit{solver} otimizado para um 
 problema diferente assim obtendo uma performance média melhor. Esta técnica pode ser 
-denominada como competiva.
+denominada como completiva.
 
 Uma das vantagens desta técnica é sua fácil implementação, uma vez que pode ser realizada 
 utilizando apenas um script que inicia os diversos \textit{SAT solvers} nos nós do sistema. 
@@ -634,43 +636,32 @@ desta técnica é apresentada na figura \ref{fig:port}
     \label{fig:port}
 \end{figure}
 
-\subsubsection{Problemas na parelização de \textit{SAT solvers}}
-
-Para \textit{solvers} paralelos portifolio não existem problemas de controle ou em 
+Para \textit{solvers} paralelos portfólio não existem problemas de controle ou em 
 sua arquitetura, porém eles não apresentam grandes ganhos de performance. Existe um 
-ganho médio quando no protifolio existe um \textir{solver} ou heuristica que apresenta 
-uma perfomance muito boa para o problema a ser resolvido, porém isso pode não acontecer ou 
+ganho médio quando no prefolio existe um \textit{solver} ou heurística que apresenta 
+uma performance muito boa para o problema a ser resolvido, porém isso pode não acontecer ou 
 o ganho pode ser pequeno. Outra questão é que boa parte do poder computacional utilizado 
-é simplesmente inutil, assim apresentando uma má utilização dos recursos disponiveis. Por 
+é simplesmente inútil, assim apresentando uma má utilização dos recursos disponíveis. Por 
 fim esta técnica não apresenta nenhum ganho para problemas que são insatifaziveis, e mesmo 
 neste cenário apresenta um custo muito maior.
 
-%\subsection{Lei de Amdahl}
-%\label{sec:amdahl}
-%
-%Em computação paralela denomina-se \textit{speedup} como o ganho de velocidade 
-%com a utilização de múltiplos processadores. O \textit{speedup} pode ser medido 
-%pela relação entre o tempo gasto por um processador e o tempo gasto por múltiplos 
-%processadores.
-%
-%O \textit{speedup} pode ser obtido através da Lei de Amdahl\cite{Amdahl1967}, esta lei leva em 
-%consideração que o tempo gasto por múltiplos processadores é soma entre o tempo 
-%gasto pela parte sequencial do algoritmo e a relação entre o número de processadores 
-%e a parte paralela do algoritmo. Ela é descrita a seguir em \ref{eq:amdahl}.
-%
-%$S(n)$ é o \textit{speedup} para n processadores, $T$ é o tempo gasto para n processadores, 
-%n é o número de processadores e $B$ é a parte sequencial do algoritmo.
-%
-%\begin{equation} \label{eq:amdahl}
-%S(n)=\frac{T(1)}{T(n)}=\frac{T(1)}{T(1)(B+\frac{1}{n}(1-B))}=\frac{1}{B+\frac{1}{n}(1-B)}
-%\end{equation}
+Uma implementação popular da técnica portfólio para o problema SAT é o ManySAT\cite{Hamadi09manysat}. 
+Este \textit{SAT solver} utiliza diferentes configurações aplicadas ao \textit{solver} 
+MiniSAT e ao preprocessador SatElite, com isso ele obtém um bom ganho de desempenho 
+pois os algoritmos baseados em DPLL modernos são bastante sensíveis as diferentes 
+configurações de suas otimizações. O ManySAT foi amplamente testado em usos industriais 
+de \textit{solver} e ficou em primeiro lugar do \textit{track} de paralelo da SAT-Race de 2008.
+Este \textit{solver} foi desenvolvido pela Microsoft e pelo CRIL-CNRS.
 
-\subsubsection{Algoritmos \textit{SAT Solver} Paralelos}
-\label{sec:satparallel}
+\subsection{Particionamento do espaço de busca}
 
-Existem diversas técnicas para se resolver o problema SAT em paralelo, as duas mais 
-comuns são paralelização dos algoritmos \textit{SAT solvers} clássicos e a técnica 
-chamada de portfólio. A seguir são apresentadas essas técnicas e  suas implementações.
+Esta técnica consistem em dividir os espaço de busca do problema a ser explorado em espaços de 
+busca menores a serem processados nos vários nós do sistema. A divisão da busca pode ser feita 
+de diversa maneiras, sendo aplicada tanto em sistemas multi-core quanto sistemas conectados 
+através de uma rede.Esta técnica também é bastante popular, sendo bastante utilizada na paralelização 
+de algoritmos baseado tanto em DPLL quanto em CDCL. As diferentes formas de implementação desta 
+técnica são apresentadas a seguir. Este trabalho também utiliza esta técnica, na seção de desenvolvimento 
+serão apresentados detalhes de como esta técnica foi utilizada no algoritmo QuantumSAT.
 
 O DPLL clássico pode ser paralelizado através da execução em paralelo de sua busca recursiva. 
 Para se fazer isto todos os nós recebem $\Phi$ e então cada nó recebe uma fórmula simplificada 
@@ -687,8 +678,6 @@ Na comparação entre estas duas versões foi visto que a versão para rede tem 
 melhor que a para memória compartilhada, isto se dá pois na versão 
 com memória compartilhada os processos entram em uma condição de corrida para obter acesso 
 aos recursos o que causa um \textit{overhead} maior que a comunicação por rede.
-
-%SATZ
 
 O CDCL é um algoritmo mais complexo de se paralelizar, pois com a adição da estrutura de 
 cláusulas aprendidas a busca é feita de maneira pouco ordenada, o que dificulta o processo 
@@ -719,37 +708,36 @@ Este \textit{solver} foi desenvolvido em C++ e MPI e sua arquitetura é apresent
     \label{fig:PMSat}
 \end{figure}
 
-%GriSAT
+Como pode-se ver nas implementações apresentadas esta técnica apresenta vários desafios. O 
+balanço de carga é um problema complexo em toda a área de computação paralela, neste contexto 
+a solução esta na divisão do espaço de busca em um grande número de espaços, e dinamicamente 
+se distribuir as tarefas a medida que os escravos ficam inativos, esta dinâmica é apresentada 
+na imgemXXXXXXXX. Outro problema existe em sistemas conectados através de uma rede, onde pode 
+existir uma corrida pelos recursos da rede, este problema pode ser mitigado utilizando redes 
+com uma maior banda. Em sistemas de memória compartilhada pode-se estourar a memória quando 
+são criados muitos subespaços de busca, isto é mitigado adicionando mais memória ao sistema.
 
-%No contexto de técnicas de paralelização existe uma técnica conhecida como portfólio, essa 
-%técnica consiste em executar múltiplos algoritmos distintos para solução de um problema 
-%comum, no caso do SAT múltiplos \textit{SAT Solvers}. Nesta técnica os algoritmos a serem 
-%utilizados devem ser escolhidos de forma a maximizar a velocidade de execução no caso médio, 
-%procurando-se escolher algoritmos com propriedades distintas. Seu speedup não pode ser avaliado 
-%pela Lei de Amdahl, pois não consiste na paralelização de um algoritmo e sim em uma técnica de 
-%execução em paralelo. Uma descrição desta técnica é apresentada na 
-%figura \ref{fig:port}
-%
-%\begin{figure}[H]
-%    \centering
-%    \includegraphics[width=0.8\textwidth]{figuras/portfolio.jpg}
-%    \caption{Funcionamento de um algoritmo portfólio\cite{nelson2013new}}
-%    \label{fig:port}
-%\end{figure}
+\subsection{Particionamento do problema}
 
-Uma implementação popular da técnica portfólio para o problema SAT é o ManySAT\cite{Hamadi09manysat}. 
-Este \textit{SAT solver} utiliza diferentes configurações aplicadas ao \textit{solver} 
-MiniSAT e ao preprocessador SatElite, com isso ele obtém um bom ganho de desempenho 
-pois os algoritmos baseados em DPLL modernos são bastante sensíveis as diferentes 
-configurações de suas otimizações. O ManySAT foi amplamente testado em usos industriais 
-de \textit{solver} e ficou em primeiro lugar do \textit{track} de paralelo da SAT-Race de 2008.
-Este \textit{solver} foi desenvolvido pela Microsoft e pelo CRIL-CNRS.
+Esta técnica consiste em dividir a fórmula proporcional a ser resolvida em fórmulas menores,
+realizar a busca da solução destas fórmulas em paralelo e combinar as soluções. Apesar da 
+busca pela solução poder ser feita em paralelo existe a necessidade de comunicação entre os nós, 
+pois existem variáveis compartilhadas entre as fórmulas.
 
-Existem algoritmos \textit{SAT solvers} que são puramente estocásticos\allowbreak\cite{pprobSAT}
-, por tanto sua execução não possui uma sequência de execução determinística. 
-A paralelização destes algoritmos é trivial, sendo apenas necessário executar n 
-instâncias do algorítimo, seu ganho é bom, seguindo a Lei de Amdahl o speedup 
-teórico é de n.
+O \textit{sat solver} JACK-SAT implementa esta técnica, sua implementação original divide a fórmula 
+proporcional V em duas fórmulas V1 e V2, criando assim dois problemas P1=(V1,C1) e P2=(V2,C2) 
+sendo C1 e C2 as variáveis que estão presente exclusivamente em V1 e V2 respectivamente, também 
+é criado um conjunto C3, com as variáveis compartilhadas em as fórmulas. Cada problema é resolvido 
+independentemente e é o após isso o algoritmo tenta combinar as soluções, procurando as soluções não 
+conflitantes com as variáveis em C3. Existem diversas melhorias nesta implementação que não serão 
+discutidas, pois a ideia central da implementação é a mesma. Outra melhoria possível seria a tentativa 
+de se evitar conflitos com C3 durante a busca pelas soluções de P1 e P2.
+
+Esta técnica não muito popular devido aos seus problemas. Sendo um deles que a busca da solução dos 
+subproblemas também apresenta complexidade exponencial. Outro é que a adição da etapa de junção das 
+soluções cresce de forma exponencial com o número de soluções encontradas para os subproblemas. Além 
+disto esta técnica apresenta uma escalabilidade muito baixa, o que não é desejado pois a tendencia 
+é um aumento no numero de nós dos sistemas.
 
 \chapter{Desenvolvimento}
 
@@ -763,10 +751,10 @@ e metodologia de testes.
 
 Como dito anteriormente este algoritmo realiza uma busca em um espaço de estados. Esta busca 
 é também a parte mais longa do algoritmo, uma vez que é necessário que a mesma visite todos os
-estados possíveis do problema para que o mesmo seja provado insatifazivel ou para que sejam encontradas 
+estados possíveis do problema para que o mesmo seja provado infazível ou para que sejam encontradas 
 todas as soluções.
 
-Existem dois modos de realizar uma busca em um espaço de estados, em largura(BFS) ou em profundidade(DFS). 
+Existem dois modos de realizar uma busca em um espaço de estados, em largura(BF) ou em profundidade(DFS). 
 A busca em largura funciona partindo de uma raiz e visitando todos os seus vértices. A busca em profundidade 
 funciona partindo de uma raiz e explorando cada ramo do espaço até que seja encontrado um nó folha, 
 quando este é encontrado é realizado o backtracking.
@@ -835,18 +823,101 @@ gap é vazio deve ser colocado como uma solução e não deve ser adicionado nos
 considerar como final o estado que não reduz o tamanho gap, este não deve ser adicionado aos sucessores 
 nem as soluções.
 
-Uma descrição visual do funcionamento do algoritmo é apresentada na imagem a seguir.
+%Uma descrição visual do funcionamento do algoritmo é apresentada na imagem a seguir.
+
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=1.2\textwidth]{figuras/AlgRep.pdf}
+%    \caption{Arvore de decisão da implementação do trabalho}
+%    \label{fig:AlgRep}
+%\end{figure}
+
+\subsection{Busca Paralela}
+
+Uma busca em grafos pode ser realizada de duas formas, em profundidade e em largura. A busca em 
+profundidade explora os nós do grafo seguindo através dos filhos dos nós. A busca em largura explora 
+os nós do grafo seguindo através dos vizinhos dos nós.
+
+A implementação sequencial deste algoritmo utilizou uma busca em largura, esta busca foi escolhida pois 
+a utilização desta implementação necessitava da menor solução para o problema SAT, sendo assim necessitava 
+fazer uma busca completa, com essa restrição o modo de busca era pouco importante.
+
+Para o caso desta implementação desejamos apenas encontrar uma solução qualquer, o mais rápido possível, 
+neste caso a forma da busca pode ter algum impacto. Para verificar isto decidi utilizar um método 
+empírico, pois as duas implementações são facilmente realizadas e alguns testes rápidos mostrariam 
+evidencias suficientes para que uma boa decisão fosse tomada. Realizei os testes utilizando algumas 
+instâncias do problema SAT aleatórias pequenas.
+
+A busca em largura apresentou algumas vantagens no balanceamento de carga, uma vez que foi possível 
+cada nó do sistema realizar uma porção menor do trabalho, porém essa característica apresenta uma 
+desvantagem ela necessita de muito mais comunicação entre os nós. Outra desvantagem está no fato de 
+a forma com que a busca é realizada faz com que sejam explorados mais estados antes da primeira solução 
+ser encontrada, na média das buscas.
+
+A busca em profundidade apresentou as vantagens de possuir menos comunicação entre os nós e de encontrar 
+a primeira solução explorando menos estados. Porém apresenta um balanço de carga entre os nós pior, esse 
+cenário pode ser agravado se os nós apresentarem diferenças de performance.
+
+Estudar como selecionar a busca utilizando a máquina da UFSC.
+
+\section{exemplo}
+
+Neste exemplo utilizaremos dois nós e a pré-execução em paralelo com apenas um nível na arvore. Este 
+exemplo funciona para demostrar a lógica de funcionamento paralelo do algoritmo, porém a implementação 
+na prática funciona com parâmetros diferentes. O exemplo utiliza o seguinte $\phi$
+
+$$0: ( p_2\vee\neg p_3\vee p_4\vee\neg p_1) \wedge $$
+$$1: ( \neg p_2\vee\neg p_1\vee p_4\vee p_3) \wedge $$
+$$2: ( p_2\vee p_3\vee\neg p_4\vee p_1) \wedge $$
+$$3: ( p_1\vee p_4\vee p_3\vee p_2) \wedge $$
+$$4: ( p_2\vee p_4\vee\neg p_1\vee p_3) \wedge $$
+$$5: ( p_2\vee\neg p_1\vee\neg p_3\vee\neg p_4) \wedge $$
+$$6: ( \neg p_1\vee\neg p_3 \vee p_4\vee\neg p_2) \wedge $$
+$$7: ( p_4\vee\neg p_3\vee p_1\vee\neg p_2) \wedge $$
+$$8: ( p_1\vee\neg p_2 \vee\neg p_4\vee p_3) \wedge $$
+$$9: ( p_3\vee\neg p_1\vee\neg p_2\vee\neg p_4) $$
+
+Sendo assim o quanta gerado é o seguinte:
+
+$P_1^{\{3,4,8,9\}}, \neg P_1^{\{1,2,5,6,7,10\}}, P_2^{\{1,3,4,5,6\}}, \neg P_2^{\{2,7,8,9,10\}},$
+$P_3^{\{2,3,4,5,9,10\}}, \neg P_3^{\{1,6,7,8\}}, $
+$P_4^{\{1,2,4,5,7,8\}}, \neg P_4^{\{3,6,9,10\}} $
+
+A imagem a seguir descreve o funcionamento do algoritmo na situação citada anteriormente. A nó 
+a@comp é o nó que realiza controle do sistema, ele responsável por manter os estados que ainda 
+necessitam ser expandidos, as soluções dos que já foram expandidos e a ordem correta da comunicação, 
+fisicamente este nó pode mudar de localização em caso de falha, esta tarefa cabe aos supervisors. 
+Os nós 1@comp e 2@comp são os trabalhadores eles recebem um estado a ser expandido, realiza sua expansão 
+e retorna o resultado para o nó a@comp.
+
+Neste caso o nó 1@comp pegará o estado com o phi: [-1] e o expandirá, assim retornando a 
+solução {phi:[-1,4,2,3], phi ...}, o nó 2@comp pegará o estado com o phi: [4] e retornará a solução 
+{phi: [4,2,3], phi ...}, como o nó 2@comp precisa visitar menos estados durante a sua expansão este 
+acabará antes e então pegará o estado com phi: [-2] e assim por diante. Lembrando que este exemplo 
+serve para exemplificar o funcionamento do algoritmo por isso está buscando todas as soluções, a 
+execução real para assim que a primeira solução é encontrada e caso o nó não encontre solução ele 
+simplesmente retorna {}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.2\textwidth]{figuras/AlgRep.pdf}
-    \caption{Arvore de decisão da implementação do trabalho}
-    \label{fig:AlgRep}
+    \includegraphics[width=0.8\textwidth]{figuras/nodeDynamic.png}
+    \caption{Dinâmica dos nós}
+    \label{fig:port}
 \end{figure}
 
-\section{Busca Paralela}
+Para demonstrar o funcionamento paralelo do algoritmo também é importante conhecer o funcionamento do
+\textit{state pool}, a figura a seguir apresenta os três primeiros estados da \textit{state pool}.
 
-Estudar como selecionar a busca utilizando a máquina da UFSC.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figuras/threeStates.png}
+    \caption{Estados iniciais}
+    \label{fig:port}
+\end{figure}
+
+\chapter{Resultados Experimentais e Análises}
+
+\chapter{Conclusões}
 
 \bibliographystyle{abnt-num}
 \bibliography{bibliografia}
